@@ -83,6 +83,43 @@ function Labels() {
   return <g>{items}</g>;
 }
 
+function Arrows() {
+  const items = [];
+  // Cardinal arrows: long tapered pointers, N highlighted red
+  Object.entries(CARDINALS).forEach(([deg]) => {
+    const a = Number(deg);
+    const color = a === 0 ? "#FF453A" : "#E2E8F0";
+    items.push(
+      <g key={`ca-${a}`} transform={`rotate(${a})`}>
+        <polygon
+          points="0,-258 11,-168 0,-182 -11,-168"
+          fill={color}
+          opacity={a === 0 ? 0.95 : 0.85}
+        />
+        <polygon
+          points="0,-258 11,-168 0,-182"
+          fill={a === 0 ? "#FF6B62" : "#F8FAFC"}
+          opacity="0.6"
+        />
+      </g>
+    );
+  });
+  // Intercardinal arrows: smaller pointers
+  Object.entries(INTERCARDINALS).forEach(([deg]) => {
+    const a = Number(deg);
+    items.push(
+      <g key={`ia-${a}`} transform={`rotate(${a})`}>
+        <polygon
+          points="0,-238 8,-172 0,-184 -8,-172"
+          fill="#94A3B8"
+          opacity="0.55"
+        />
+      </g>
+    );
+  });
+  return <g>{items}</g>;
+}
+
 export const CompassRose = ({ heading, bearing, bearingVisible, onBearingChange }) => {
   const svgRef = useRef(null);
   const draggingRef = useRef(false);
@@ -140,6 +177,7 @@ export const CompassRose = ({ heading, bearing, bearingVisible, onBearingChange 
       {/* Rotating card */}
       <g style={{ transform: `rotate(${rot}deg)`, transition: "none" }} data-testid="compass-rotating-card">
         <Ticks />
+        <Arrows />
         <Labels />
       </g>
 
