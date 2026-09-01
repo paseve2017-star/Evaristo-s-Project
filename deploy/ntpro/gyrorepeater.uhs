@@ -8,6 +8,8 @@
            If you use [SerialToAddress] mapping, map Script_ID 3 to the UDP port. -->
       <assign> MBSEN = "|3" </assign>
       <assign> TEHDT = "|" + uhiGyroHeading </assign>
+      <assign> TEROT = "|" + uhiGyroRateOfTurn </assign>
+      <assign> TEVTG = "|" + uhiGPS_CMG + "," + uhiGPS_SMG </assign>
     </timer>
   </uhi>
 </root>

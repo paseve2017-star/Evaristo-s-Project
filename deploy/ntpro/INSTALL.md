@@ -25,8 +25,16 @@
 4. Run `deploy\firewall-setup.bat` **once as Administrator** (allows inbound UDP 4001).
 5. Run `deploy\run.bat` — console shows the backend listening on UDP 4001 / HTTP 8000.
    (run.bat already sets `SIMULATOR_MODE=false`.)
-6. Optional autostart: put a shortcut to `run.bat` in
-   `shell:startup`, or use NSSM/Task Scheduler to run it as a service.
+6. Optional autostart: run `deploy\install-autostart.bat` once as Administrator
+   (Task Scheduler, starts at logon) — or use NSSM for a true service.
+
+## B2. Older Windows (7 / Server 2008)
+
+- Install **Python 3.8.x** (last version supporting Win7/2008) — the backend is 3.8-compatible.
+- Use **Chrome 109** or **Firefox ESR 115** (last Win7 builds) — the repeater UI works there.
+- Alternative: run the backend on a newer PC and simply open
+  `http://<backend-pc-ip>:8000` from the Win7 station's browser — any number of
+  stations can view the same repeater simultaneously.
 
 ## C. Verify (browser-first, no packet sniffing)
 

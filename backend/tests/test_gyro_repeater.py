@@ -5,6 +5,7 @@ import asyncio
 import json
 import os
 import socket
+import threading
 import time
 
 import pytest
@@ -39,11 +40,17 @@ class TestHealth:
         assert d["stale"] is False
 
     def test_heading_changes_over_time(self):
+        # Simulator random walk is small (±0.03°/tick, rounded to .1f), so poll
+        # over a longer window and accept any observed change.
         h1 = requests.get(f"{BASE_URL}/api/health").json()["heading"]
-        time.sleep(2)
-        h2 = requests.get(f"{BASE_URL}/api/health").json()["heading"]
-        # simulator drifts; over 2 sec should nearly always differ
-        assert h1 != h2, f"Heading did not change over 2s: {h1} == {h2}"
+        changed = False
+        for _ in range(20):
+            time.sleep(0.5)
+            h2 = requests.get(f"{BASE_URL}/api/health").json()["heading"]
+            if h2 != h1:
+                changed = True
+                break
+        assert changed, f"Heading did not change over 10s: stuck at {h1}"
 
 
 # ---------- WebSocket streaming ----------
@@ -98,15 +105,29 @@ class TestNMEARobustness:
     def test_valid_custom_sentence_updates_heading(self):
         body = "HEHDT,123.4,T"
         sentence = f"${body}*{nmea_cs(body)}\r\n"
-        # Simulator is emitting 10Hz too; to catch our value we send several times
-        # and read health right after. Since sim overwrites, we check that at least
-        # one health poll within a burst captures ~123.4.
+        # Simulator emits its own HDT at 10Hz and health polls have network
+        # latency, so flood continuously in a thread while polling — our packet
+        # then holds the state for the vast majority of each 100ms window.
+        stop = threading.Event()
+
+        def flood():
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            while not stop.is_set():
+                s.sendto(sentence.encode("ascii"), ("127.0.0.1", UDP_PORT))
+                time.sleep(0.005)
+            s.close()
+
+        t = threading.Thread(target=flood, daemon=True)
+        t.start()
         seen = False
-        for _ in range(30):
-            self._send(sentence)
-            d = requests.get(f"{BASE_URL}/api/health").json()
-            if abs(d["heading"] - 123.4) < 0.5:
-                seen = True
-                break
-            time.sleep(0.02)
+        try:
+            for _ in range(20):
+                d = requests.get(f"{BASE_URL}/api/health").json()
+                if abs(d["heading"] - 123.4) < 0.5:
+                    seen = True
+                    break
+                time.sleep(0.2)
+        finally:
+            stop.set()
+            t.join(timeout=2)
         assert seen, "Custom $HEHDT,123.4 was never reflected in /api/health"

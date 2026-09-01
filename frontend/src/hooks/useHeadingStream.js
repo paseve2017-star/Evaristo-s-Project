@@ -18,6 +18,10 @@ export function useHeadingStream() {
   const [simulator, setSimulator] = useState(false);
   const [udpPort, setUdpPort] = useState(null);
   const [wsUrl, setWsUrl] = useState(getWsUrl());
+  const [rot, setRot] = useState(null);
+  const [cog, setCog] = useState(null);
+  const [sog, setSog] = useState(null);
+  const historyRef = useRef([]); // last 60 s of {t, h} samples
 
   const targetRef = useRef(null);
   const displayRef = useRef(null);
@@ -47,7 +51,15 @@ export function useHeadingStream() {
         if (typeof data.heading === "number") {
           targetRef.current = data.heading;
           if (displayRef.current === null) displayRef.current = data.heading;
+          historyRef.current.push({ t: Date.now(), h: data.heading });
+          const cutoff = Date.now() - 60000;
+          while (historyRef.current.length && historyRef.current[0].t < cutoff) {
+            historyRef.current.shift();
+          }
         }
+        if (typeof data.rot === "number") setRot(data.rot);
+        if (typeof data.cog === "number") setCog(data.cog);
+        if (typeof data.sog === "number") setSog(data.sog);
         if (data.sentence) setSentence(data.sentence);
         setSimulator(!!data.simulator);
         if (data.udp_port) setUdpPort(data.udp_port);
@@ -106,5 +118,5 @@ export function useHeadingStream() {
     setWsUrl(getWsUrl());
   }, []);
 
-  return { heading, status, sentence, simulator, udpPort, wsUrl, applyWsUrl };
+  return { heading, status, sentence, simulator, udpPort, wsUrl, applyWsUrl, rot, cog, sog, historyRef };
 }

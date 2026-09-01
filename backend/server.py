@@ -26,6 +26,9 @@ logger = logging.getLogger("gyro-repeater")
 
 state = {
     "heading": None,
+    "rot": None,
+    "cog": None,
+    "sog": None,
     "last_packet_at": None,
     "last_sentence": None,
     "last_sender": None,
@@ -41,22 +44,29 @@ def nmea_checksum(body: str) -> int:
     return cs
 
 
-def parse_hdt(raw: str):
-    """Return heading in degrees [0,360) from a $--HDT sentence, else None."""
+def verified_body(raw: str):
+    """Return the checksum-verified NMEA body (without $ and *cs), else None."""
     raw = raw.strip()
     if not raw.startswith("$"):
         return None
     payload = raw[1:]
-    if "*" in payload:
-        body, _, cs = payload.partition("*")
-        cs = cs.strip()[:2]
-        try:
-            if int(cs, 16) != nmea_checksum(body):
-                return None
-        except ValueError:
+    if "*" not in payload:
+        return None
+    body, _, cs = payload.partition("*")
+    cs = cs.strip()[:2]
+    try:
+        if int(cs, 16) != nmea_checksum(body):
             return None
-    else:
-        body = payload
+    except ValueError:
+        return None
+    return body
+
+
+def parse_hdt(raw: str):
+    """Return heading in degrees [0,360) from a $--HDT sentence, else None."""
+    body = verified_body(raw)
+    if body is None:
+        return None
     parts = body.split(",")
     if len(parts) < 3 or not parts[0].endswith("HDT"):
         return None
@@ -68,8 +78,62 @@ def parse_hdt(raw: str):
         return None
 
 
+def parse_rot(raw: str):
+    """Return rate of turn (deg/min, negative = port) from $--ROT, else None."""
+    body = verified_body(raw)
+    if body is None:
+        return None
+    parts = body.split(",")
+    if len(parts) < 2 or not parts[0].endswith("ROT"):
+        return None
+    try:
+        return float(parts[1])
+    except ValueError:
+        return None
+
+
+def parse_vtg(raw: str):
+    """Return (cog_deg, sog_knots) from $--VTG, else None."""
+    body = verified_body(raw)
+    if body is None:
+        return None
+    parts = body.split(",")
+    if len(parts) < 6 or not parts[0].endswith("VTG"):
+        return None
+    try:
+        return float(parts[1]) % 360.0, float(parts[5])
+    except ValueError:
+        return None
+
+
+def handle_sentence(line: str) -> bool:
+    h = parse_hdt(line)
+    if h is not None:
+        state["heading"] = h
+        return True
+    r = parse_rot(line)
+    if r is not None:
+        state["rot"] = r
+        return True
+    v = parse_vtg(line)
+    if v is not None:
+        state["cog"], state["sog"] = v
+        return True
+    return False
+
+
 def build_hdt(heading: float) -> str:
     body = f"HEHDT,{heading:.1f},T"
+    return f"${body}*{nmea_checksum(body):02X}\r\n"
+
+
+def build_rot(rot: float) -> str:
+    body = f"HEROT,{rot:.1f},A"
+    return f"${body}*{nmea_checksum(body):02X}\r\n"
+
+
+def build_vtg(cog: float, sog: float) -> str:
+    body = f"HEVTG,{cog:.1f},T,,M,{sog:.1f},N,,K"
     return f"${body}*{nmea_checksum(body):02X}\r\n"
 
 
@@ -80,10 +144,8 @@ class HeadingUDPProtocol(asyncio.DatagramProtocol):
         except Exception:
             return
         for line in text.splitlines():
-            heading = parse_hdt(line)
-            if heading is None:
+            if not handle_sentence(line):
                 continue
-            state["heading"] = heading
             state["last_packet_at"] = time.monotonic()
             state["last_sentence"] = line.strip()
             state["last_sender"] = f"{addr[0]}:{addr[1]}"
@@ -98,6 +160,9 @@ async def broadcast_loop():
             age = (now - last) if last is not None else None
             msg = {
                 "heading": state["heading"],
+                "rot": state["rot"],
+                "cog": state["cog"],
+                "sog": state["sog"],
                 "ts": datetime.now(timezone.utc).isoformat(),
                 "stale": age is None or age > STALE_AFTER_SEC,
                 "age_sec": round(age, 3) if age is not None else None,
@@ -125,12 +190,19 @@ async def simulator_loop():
     )
     heading = 278.5
     rate = 0.0
+    sog = 12.0
     try:
         while True:
             if random.random() < 0.01:
-                rate = random.uniform(-3.0, 3.0)
+                rate = random.uniform(-0.05, 0.05)  # deg per 0.1 s -> ±30°/min max
+            if random.random() < 0.005:
+                sog = random.uniform(4.0, 16.0)
             heading = (heading + rate * 0.1 + random.uniform(-0.03, 0.03)) % 360.0
+            rot = rate * 600.0  # deg/min
+            cog = (heading + 2.5 + random.uniform(-0.5, 0.5)) % 360.0
             transport.sendto(build_hdt(heading).encode("ascii"))
+            transport.sendto(build_rot(rot).encode("ascii"))
+            transport.sendto(build_vtg(cog, sog).encode("ascii"))
             await asyncio.sleep(0.1)
     finally:
         transport.close()
