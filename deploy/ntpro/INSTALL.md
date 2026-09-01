@@ -4,12 +4,22 @@
 
 1. Copy `gyrorepeater.uhs` and `gyroudp.cfg` into the NTPRO UHI folder
    (same folder that holds `OVERHEAD.CFG` / `OverheadDef.uhs`).
-2. Open `gyroudp.cfg` and fill the `[Plugins]` section: copy the `NmeaPort.dll`
-   block from your working NMEA configuration and set its output to
-   **UDP → 192.168.0.255 : 4001**. Do not change anything else.
+2. **NmeaPort.dll is serial-only** (confirmed from the DLL itself: 4800 8N1,
+   COM-port transport, no UDP). So the NTPRO side needs a tiny bridge:
+   - Copy the `NmeaPort.dll` plugin block from your working NMEA configuration
+     into `gyroudp.cfg` **unchanged** — serial output to a COM port, exactly
+     like the overhead panel link. Use a free physical port or a virtual pair
+     (com0com) if none is free.
+   - The COM port/baud are NOT set in the .cfg: NmeaPort.dll has its own
+     settings window (`NmeaPortWindow`). In Nmea.exe, open the NmeaPort window
+     for this link and select **COM3 (placeholder — use your free port),
+     4800 baud, 8N1** — matching the bridge defaults.
+   - On the NTPRO PC: `pip install pyserial`, edit `COM_PORT`/`TARGET` at the
+     top of `serial_to_udp.py`, then run `run_bridge.bat`. It forwards every
+     `$...` sentence from the COM port to UDP broadcast 192.168.0.255:4001.
    Note: `gyrorepeater.uhs` uses script ID `MBSEN "|3"` (your existing links use
    1 and 2). If your `[SerialToAddress]` section routes by Script_ID, map 3 to
-   the UDP output — otherwise leave it empty as in `OVERHEAD.CFG`.
+   the chosen COM port — otherwise leave it empty as in `OVERHEAD.CFG`.
 3. Register the new link file the same way `OVERHEAD.CFG` is registered
    (add `gyroudp.cfg` to `uhi.cfg`, or start it via `Nmea.exe` alongside the
    overhead panel link).
