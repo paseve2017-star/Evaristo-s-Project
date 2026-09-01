@@ -7,6 +7,9 @@
 2. Open `gyroudp.cfg` and fill the `[Plugins]` section: copy the `NmeaPort.dll`
    block from your working NMEA configuration and set its output to
    **UDP → 192.168.0.255 : 4001**. Do not change anything else.
+   Note: `gyrorepeater.uhs` uses script ID `MBSEN "|3"` (your existing links use
+   1 and 2). If your `[SerialToAddress]` section routes by Script_ID, map 3 to
+   the UDP output — otherwise leave it empty as in `OVERHEAD.CFG`.
 3. Register the new link file the same way `OVERHEAD.CFG` is registered
    (add `gyroudp.cfg` to `uhi.cfg`, or start it via `Nmea.exe` alongside the
    overhead panel link).

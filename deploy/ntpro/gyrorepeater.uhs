@@ -4,6 +4,9 @@
     <!-- Gyro Compass Repeater: true heading only, 10 Hz -->
     <!-- Mirrors OverheadDef.uhs pattern; NmeaPort plugin wraps TEHDT into $HEHDT,...,T*cs -->
     <timer period="100">
+      <!-- Unique script ID (existing links use |1 OverheadDef, |2 OverheadZD).
+           If you use [SerialToAddress] mapping, map Script_ID 3 to the UDP port. -->
+      <assign> MBSEN = "|3" </assign>
       <assign> TEHDT = "|" + uhiGyroHeading </assign>
     </timer>
   </uhi>
