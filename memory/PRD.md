@@ -35,6 +35,12 @@ Iteration 1 (2026-09-01): backend 6/6 pytest (`/app/backend/tests/test_gyro_repe
 - P1: Windows packaging (run.bat / service), serve frontend static build from FastAPI for `http://<backend-ip>:8000` access; configurable talker ID filter.
 - P2: Rate-of-turn indicator, 60 s heading strip chart, VTG COG/SOG panel, MongoDB history log (24 h TTL), RS-422 physical repeater bridge, multi-station support.
 
+## Session state (paused 2026-09-01, user continues tomorrow)
+- App fully working in this environment (simulator mode ON). Deploy package complete in /app/deploy/.
+- Confirmed UHI patterns from user pastes: OverheadDef.uhs (MBSEN |1), OverheadZD.uhs (MBSEN |2) → gyrorepeater.uhs uses |3 at 100 ms.
+- Pending on user side: paste NmeaPort.dll [Plugins] block into gyroudp.cfg (UDP → 192.168.0.255:4001), then on-site install per INSTALL.md.
+- Likely next requests: on-site debug results, scale fix, Windows autostart, or v2 features (ROT, strip chart, VTG panel).
+
 ## Next tasks
 1. NTPRO-side files authored (2026-09-01): deploy/ntpro/gyrorepeater.uhs (timer 100 ms, TEHDT only, mirrors OverheadDef.uhs pattern — CONFIRMED against user's full OverheadDef.uhs paste; overhead runs at 200 ms/5 Hz, repeater uses 100 ms/10 Hz) + gyroudp.cfg (broadcast 192.168.0.255:4001; [Plugins] block to be copied from user's working NmeaPort.dll config) + INSTALL.md (browser-first verification, scale check, troubleshooting).
 2. On-site: user fills gyroudp.cfg [Plugins] from their working NmeaPort config, runs firewall-setup.bat + run.bat on repeater PC, verifies via status LED (green, no SIM badge) and heading scale check.
