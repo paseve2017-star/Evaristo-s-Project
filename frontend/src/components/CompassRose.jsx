@@ -49,9 +49,9 @@ function Labels() {
     items.push(
       <g key={a} transform={`rotate(${a})`}>
         <text x="0" y={-R_LABEL} textAnchor="middle" dominantBaseline="middle"
-          fill="#CBD5E1" fontSize="34" fontFamily="'JetBrains Mono', monospace"
+          fill="#CBD5E1" fontSize="26" fontFamily="'JetBrains Mono', monospace"
           fontWeight="500" opacity="0.85">
-          {a / 10}
+          {String(a).padStart(3, "0")}
         </text>
       </g>
     );
