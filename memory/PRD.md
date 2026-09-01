@@ -1,0 +1,41 @@
+# NTPRO Software Gyro Compass Repeater — PRD
+
+## Original problem statement
+Fullscreen web-based gyro compass repeater displaying live true heading from the Transas NTPRO 5000 simulator. NTPRO's UHI broadcasts NMEA `$HEHDT` over UDP on the LAN; a FastAPI backend listens, parses, and streams heading to a React frontend over WebSocket, rendering a traditional rotating analog compass rose (top-view, full 360°, usable to take bearings in any direction), fixed red lubber line, and a large digital heading readout. Runs fullscreen on a dedicated monitor.
+
+## User choices (locked)
+- UDP port: **4001**, bound to **0.0.0.0**
+- Dev/testing: **built-in simulator mode** emits synthetic `$HEHDT` to 127.0.0.1:4001 at 10 Hz (SIMULATOR_MODE=true)
+- Digital heading format: **tenths** (278.5°) with TRUE label
+- MongoDB heading history log: **skipped** (v1)
+- Top-view fullscreen rose with bearing-taking at any direction
+
+## Architecture
+```
+[NTPRO / simulator] --$HEHDT UDP:4001--> [FastAPI :8001]
+  asyncio UDP listener -> NMEA parser (checksum-verified) -> WebSocket /api/ws/heading (10 Hz)
+                                              + /api/health (last-packet-age)
+        ^                                              |
+        |________ React frontend (wss, auto-reconnect, rAF smoothing) ___|
+```
+
+## Implemented (2026-09-01)
+- Backend `/app/backend/server.py`: asyncio UDP listener (0.0.0.0:4001), checksum-verified HDT parser, 10 Hz WebSocket broadcaster (`/api/ws/heading`), `/api/health`, built-in simulator loop with realistic turn dynamics.
+- Frontend: SVG 360° compass card (1°/5°/10° ticks, tens labels, cardinals N red-highlighted + intercardinals), unwrapped-angle rAF smoothing (no 360→0 snap), fixed red lubber line, center digital readout (tenths, JetBrains Mono, TRUE label).
+- Bearing sight tool: click/drag anywhere on rose; cyan bearing line + TB/RB readouts; reset/toggle buttons.
+- Connection LED: green LIVE / amber STALE (>2 s) / red NO DATA, with glow.
+- Fullscreen via F key or button; shortcuts F/B/R/S; settings dialog (WS URL override persisted, UDP port, source mode, packet count, last sender); raw NMEA sentence pill in footer.
+- Config in `/app/backend/.env`: UDP_PORT, UDP_HOST, SIMULATOR_MODE.
+
+## Test status
+Iteration 1 (2026-09-01): backend 6/6 pytest (`/app/backend/tests/test_gyro_repeater.py`), frontend 100%. Parser robustness verified (malformed/bad-checksum rejected, custom valid HDT accepted).
+
+## Backlog (prioritized)
+- P0: Deploy to NTPRO LAN PC; create UHI files (`gyroudp.cfg` + `gyroudp.uhs`, timer 100 ms) using NmeaPort.dll pattern; verify `uhiGyroHeading` units/scale; Wireshark/netcat validation.
+- P1: Windows packaging (run.bat / service), serve frontend static build from FastAPI for `http://<backend-ip>:8000` access; configurable talker ID filter.
+- P2: Rate-of-turn indicator, 60 s heading strip chart, VTG COG/SOG panel, MongoDB history log (24 h TTL), RS-422 physical repeater bridge, multi-station support.
+
+## Next tasks
+1. Switch SIMULATOR_MODE=false when real NTPRO feed is available.
+2. Phase A UHI script authoring + on-site verification.
+3. Phase D packaging & LAN deploy.

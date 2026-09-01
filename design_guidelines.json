@@ -1,0 +1,125 @@
+{
+  "identity_and_mission": {
+    "app_title": "Transas NTPRO 5000 Gyro Compass Repeater",
+    "app_type": "Fullscreen Dedicated Maritime Instrument Display",
+    "target_audience": "Maritime Instructors, Ship Simulator Cadets, Bridge Operators",
+    "design_archetype": "The Performance Pro / Tactical Maritime Instrument (High Precision, Zero Friction, Dark Night Console Aesthetic)",
+    "emotional_tone": "Tactical, Mission-Critical, High-Precision, Ultra-Legible, Immersive Bridge Hardware Feel"
+  },
+  "color_system": {
+    "palette_mode": "Maritime Night Mode (Default) with optional Day/Dusk Color Modes",
+    "colors": {
+      "background_primary": "#05070A",
+      "background_card_surface": "#0C0F14",
+      "background_glass_panel": "rgba(12, 16, 23, 0.85)",
+      "border_tactical": "#1E2633",
+      "border_accent": "rgba(255, 255, 255, 0.15)",
+      "text_primary": "#F8FAFC",
+      "text_secondary": "#94A3B8",
+      "text_muted": "#64748B",
+      "lubber_line_red": "#FF3B30",
+      "cardinal_north_highlight": "#FF453A",
+      "bearing_line_cyan": "#00E5FF",
+      "bearing_line_amber": "#FFB300",
+      "status_green_active": "#10B981",
+      "status_amber_stale": "#F59E0B",
+      "status_red_offline": "#EF4444",
+      "compass_card_ring": "#1A222F",
+      "compass_card_ticks_major": "#FFFFFF",
+      "compass_card_ticks_minor": "#64748B"
+    },
+    "contrast_rules": "Digital heading readout must be 100% pure white (#FFFFFF) or high-visibility tactical yellow/cyan with high contrast > 10:1 ratio against true black background."
+  },
+  "typography": {
+    "font_families": {
+      "display_heading": "Chivo, Outfit, system-ui, sans-serif",
+      "digital_readout": "JetBrains Mono, Source Code Pro, monospace",
+      "body_text": "IBM Plex Sans, Inter, system-ui, sans-serif"
+    },
+    "scale": {
+      "digital_heading_readout": "text-5xl sm:text-6xl lg:text-7xl font-mono font-bold tracking-tighter",
+      "digital_heading_tenths": "text-3xl sm:text-4xl lg:text-5xl font-mono font-light opacity-80",
+      "cardinal_letters_large": "text-2xl sm:text-3xl font-extrabold tracking-widest",
+      "intercardinal_letters": "text-xs sm:text-sm font-semibold tracking-wider opacity-75",
+      "degree_ticks_labels": "text-[10px] sm:text-[12px] font-mono font-medium opacity-80",
+      "labels_true": "text-xs sm:text-sm font-mono tracking-[0.3em] uppercase text-emerald-400 font-semibold",
+      "bearing_readout_overlay": "text-lg sm:text-xl font-mono font-semibold"
+    }
+  },
+  "layout_and_architecture": {
+    "structure": "Single Screen 100vh 100vw Overflow-Hidden Bridge Display Container",
+    "compass_card_specs": {
+      "geometry": "Top-view 360-degree SVG vector compass rose",
+      "responsive_sizing": "w-[85vw] h-[85vw] max-w-[700px] max-h-[700px] sm:max-w-[800px] sm:max-h-[800px]",
+      "rotation": "CSS transform rotate(-heading deg) smooth transition with anti-aliased SVG rendering",
+      "lubber_line": "Fixed red vertical vector at 12 o'clock position (0° top relative to screen)",
+      "bezel": "Outer metallic subtle bezel ring with precision millimeter notch markings"
+    },
+    "bearing_sight_mechanism": {
+      "interaction": "Click/Tap/Drag anywhere on compass rose, or use rotatable cursor handle to set bearing line",
+      "overlay_display": "Displays True Bearing (TB) and Relative Bearing (RB) calculations in a floating tactical hud badge",
+      "controls": "Dedicated quick reset bearing button, alignment lock, and quick degree offset buttons (+10°, -10°, +1°, -1°)"
+    },
+    "top_hud_bar": {
+      "left_section": "Transas NTPRO 5000 Gyro Repeater Status & Vessel Indicator",
+      "center_section": "Rotatable digital readout with TRUE label & status LED",
+      "right_section": "Fullscreen toggle, Sound Toggle, Bearing Line Toggle, Settings Gear Button"
+    },
+    "bottom_status_bar": {
+      "nmea_rate": "Data Refresh Rate (e.g. 10 Hz / 50ms interval)",
+      "nmea_sentence": "Live raw $HEHDT sentence stream preview pill",
+      "connection_pill": "WebSocket Connection Status LED with stale data pulse indicator (>2s latency triggers amber glow)"
+    }
+  },
+  "component_strategies": {
+    "shadcn_components_used": [
+      "Dialog / Sheet for Settings Panel (UDP Port, WS Server URL, Simulator Speed, NMEA Generator)",
+      "Switch for Simulator Mode toggle, Dark/Night palette switch, Sound Click feedback",
+      "Slider for NMEA updates/sec, smooth damping animation speed, dimming/brightness level",
+      "Badge for NMEA status, active bearing modes, connection status",
+      "Tooltip for action icons (Fullscreen, Lock Bearing, Reset Bearing)"
+    ],
+    "simulator_mock_generator": {
+      "enabled": true,
+      "features": "Built-in realistic ship turn dynamics simulator (port/starboard turn rates, course hold, sway noise) when WebSocket is disconnected, ensuring full offline demonstrability."
+    }
+  },
+  "key_features": [
+    "Precision 360° Rotating SVG Compass Rose with 1° minor ticks and 10° major ticks labeled",
+    "Centrally highlighted Digital Heading Readout with tenths precision (e.g., 278.5° TRUE)",
+    "Interactive Rotatable Bearing Line overlay calculating True Bearing & Relative Bearing",
+    "Real-time WebSocket NMEA 0183 $HEHDT parser with automatic fallback to Simulator Mode",
+    "Connection Health LED Indicator (Green = Active stream, Amber = Stale >2s, Red = Disconnected)",
+    "Dedicated Fullscreen Mode togglable via 'F' key press or HUD button",
+    "Keyboard Shortcuts (F: Fullscreen, B: Toggle Bearing Sight, R: Reset Bearing to 0°, S: Settings, Space: Pause Simulation)",
+    "Live Raw NMEA Log Monitor Drawer for maritime telemetry diagnostic"
+  ],
+  "testing_and_accessibility": {
+    "data_testid_convention": "kebab-case functional identifiers",
+    "required_test_ids": {
+      "compass_card_svg": "compass-card-svg",
+      "digital_heading_value": "digital-heading-value",
+      "digital_heading_tenths": "digital-heading-tenths",
+      "digital_heading_true_label": "digital-heading-true-label",
+      "lubber_line": "lubber-line",
+      "bearing_line_overlay": "bearing-line-overlay",
+      "bearing_value_true": "bearing-value-true",
+      "bearing_value_relative": "bearing-value-relative",
+      "bearing_reset_button": "bearing-reset-button",
+      "connection_status_led": "connection-status-led",
+      "fullscreen_toggle_button": "fullscreen-toggle-button",
+      "settings_toggle_button": "settings-toggle-button",
+      "settings_dialog": "settings-dialog",
+      "simulator_mode_switch": "simulator-mode-switch",
+      "ws_url_input": "ws-url-input",
+      "udp_port_input": "udp-port-input",
+      "nmea_log_feed": "nmea-log-feed"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Ensure all interactive elements and readouts include the specified data-testid attributes.",
+    "The background must strictly adhere to full pitch black (#05070A) for a dedicated bridge instrument feel.",
+    "Implement smooth continuous gyro card rotation math avoiding full 360-to-0 degree snap glitches (use unwrapped angle interpolation).",
+    "Include both real WebSocket listener for Transas $HEHDT sentences AND built-in interactive simulator mode so user can test without external UDP source."
+  ]
+}

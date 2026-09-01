@@ -1,0 +1,15 @@
+html,
+body,
+#root {
+  height: 100%;
+  background-color: #05070a;
+  overscroll-behavior: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(0, 229, 255, 0.25);
+}
