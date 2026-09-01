@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root>
+  <uhi>
+    <!-- Gyro Compass Repeater: true heading only, 10 Hz -->
+    <!-- Mirrors OverheadDef.uhs pattern; NmeaPort plugin wraps TEHDT into $HEHDT,...,T*cs -->
+    <timer period="100">
+      <assign> TEHDT = "|" + uhiGyroHeading </assign>
+    </timer>
+  </uhi>
+</root>

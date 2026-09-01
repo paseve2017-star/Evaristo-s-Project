@@ -190,6 +190,14 @@ async def heading_ws(websocket: WebSocket):
 
 app.include_router(api_router)
 
+# Serve the built frontend from the same process (single-URL deploy on the LAN).
+# Build once with: cd frontend && yarn build — then http://<repeater-pc-ip>:8000 opens the repeater.
+_build_dir = ROOT_DIR.parent / "frontend" / "build"
+if _build_dir.is_dir():
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=_build_dir, html=True), name="static")
+    logger.info("Serving frontend build from %s", _build_dir)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
