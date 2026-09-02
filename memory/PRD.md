@@ -41,6 +41,7 @@ Iteration 1 (2026-09-01): backend 6/6 pytest (`/app/backend/tests/test_gyro_repe
 - gyrorepeater.uhs now also assigns TEROT + TEVTG; deploy/install-autostart.bat (Task Scheduler, Win7-compatible) added; INSTALL.md gained legacy-Windows section (Python 3.8, Chrome 109/FF ESR 115, or backend on newer PC + Win7 as viewer).
 - Tests: 13/13 pass (test_gyro_repeater.py hardened: flood-thread pattern for custom-sentence test, longer poll for drift test; new test_rot_vtg.py).
 - KEY FINDING (2026-09-02): user uploaded NmeaPort.dll v5.10.5450; string analysis shows it is SERIAL-ONLY (4800 8N1, "Port = (%s)", GetPrivateProfileSectionA; no UDP/TCP). Integration path changed: NmeaPort writes to a COM port as usual + deploy/ntpro/serial_to_udp.py bridge (pyserial, broadcasts COM lines to 192.168.0.255:4001) + run_bridge.bat on the NTPRO PC.
+- Frontend production build created (2026-09-02): /app/frontend/build exists and backend now serves it at / (verified GET / → 200). Single-process deploy ready: export repo → repeater PC needs only backend/, frontend/build/, deploy/.
 - Pending on user side: COM port number to use (COM3 placeholder set, user checks on-site); baud CONFIRMED 4800 8N1 (DLL default). Port/baud are configured in the NmeaPort settings window (NmeaPortWindow) inside Nmea.exe — NOT in the .cfg (user's OVERHEAD.CFG paste confirmed [Plugins] holds no serial settings). gyroudp.cfg is final as a mirror; then on-site install per INSTALL.md.
 
 ## Next tasks
