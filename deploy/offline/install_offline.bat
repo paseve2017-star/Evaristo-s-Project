@@ -12,7 +12,7 @@ if "%~1"=="" (
   pause
   exit /b 1
 )
-python -m pip install --no-index --find-links "%~dp0%~1" fastapi uvicorn websockets python-dotenv
+python -m pip install --no-index --find-links "%~dp0%~1" fastapi uvicorn websockets python-dotenv pyserial
 echo.
 echo Done. If no errors above, run run.bat in the backend folder.
 pause

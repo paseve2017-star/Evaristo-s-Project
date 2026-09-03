@@ -14,9 +14,11 @@
      settings window (`NmeaPortWindow`). In Nmea.exe, open the NmeaPort window
      for this link and select **COM3 (placeholder — use your free port),
      4800 baud, 8N1** — matching the bridge defaults.
-   - On the NTPRO PC: `pip install pyserial`, edit `COM_PORT`/`TARGET` at the
+   - On the NTPRO PC: install pyserial, edit `COM_PORT`/`TARGET` at the
      top of `serial_to_udp.py`, then run `run_bridge.bat`. It forwards every
      `$...` sentence from the COM port to UDP broadcast 192.168.0.255:4001.
+     Offline? pyserial's wheel is already in `deploy\offline\wheels-*` —
+     `install_offline.bat` installs it too (it's pure Python, works on both).
    Note: `gyrorepeater.uhs` uses script ID `MBSEN "|3"` (your existing links use
    1 and 2). If your `[SerialToAddress]` section routes by Script_ID, map 3 to
    the chosen COM port — otherwise leave it empty as in `OVERHEAD.CFG`.
