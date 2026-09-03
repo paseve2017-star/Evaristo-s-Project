@@ -31,7 +31,18 @@
 2. Copy the `backend/` folder and the frontend `build/` folder to e.g. `C:\gyro-repeater\`.
    - Build the frontend once: `cd frontend && yarn build` (do this before copying,
      or copy a pre-built `build/` folder).
-3. `pip install -r requirements.txt`
+3. `pip install -r deploy\requirements-repeater.txt`
+   (use this MINIMAL file — the full backend `requirements.txt` contains
+   dev-only packages that often fail on older machines)
+   - If you get "No matching distribution found / from versions: none":
+     a. `python --version` must be 3.8+ (3.8.x on Win7/2008, 3.10+ on Win10)
+     b. Upgrade pip: `python -m pip install --upgrade pip`
+     c. Still failing → likely no internet/TLS on that PC. Use the OFFLINE
+        method: on any PC WITH internet (same Windows bitness, same Python
+        major.minor), run:
+          pip download -r requirements-repeater.txt -d wheels
+        copy the `wheels` folder to the repeater PC, then:
+          pip install --no-index --find-links wheels -r requirements-repeater.txt
 4. Run `deploy\firewall-setup.bat` **once as Administrator** (allows inbound UDP 4001).
 5. Run `deploy\run.bat` — console shows the backend listening on UDP 4001 / HTTP 8000.
    (run.bat already sets `SIMULATOR_MODE=false`.)
