@@ -9,7 +9,9 @@
 /coverage
 
 # production
-/build
+# NOTE: /build is intentionally COMMITTED — the prebuilt UI is deployed to
+# offline repeater PCs that cannot run yarn build.
+# /build
 
 # misc
 .DS_Store
