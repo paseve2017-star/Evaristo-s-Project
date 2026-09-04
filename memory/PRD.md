@@ -52,3 +52,4 @@ Iteration 1 (2026-09-01): backend 6/6 pytest (`/app/backend/tests/test_gyro_repe
 3. Optional: Windows autostart via shell:startup or NSSM; unicast fallback if broadcast is blocked.
 
 - ON-SITE (2026-09-03, late): user confirmed their local copy has NO frontend/build folder (stale ZIP). server.py updated: when frontend/build is missing at startup, GET / returns a friendly JSON (expected path + fix) instead of cryptic "detail: Not Found". USER ACTION PENDING: Save to GitHub again, download fresh ZIP, verify it contains frontend/build/index.html BEFORE copying, place frontend/build NEXT TO backend/ (C:\gyro-repeater\frontend\build), restart run.bat. Interim data check: http://localhost:8000/api/health.
+- User re-exported and confirmed the fresh ZIP contains frontend/build + wheels — downloading now. Next expected: compass UI loads at localhost:8000, then two-PC LAN link.
