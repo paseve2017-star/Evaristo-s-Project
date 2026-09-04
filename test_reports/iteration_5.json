@@ -1,0 +1,30 @@
+{
+  "summary": "Narrow iteration 5 verification of the build-missing fallback branch added to /app/backend/server.py, plus regression check on GET /, /api/health, and WS /api/ws/heading. All checks pass.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "code_review_of_fallback": {
+    "location": "/app/backend/server.py lines 267-279",
+    "condition": "_build_dir = ROOT_DIR.parent / 'frontend' / 'build'; if _build_dir.is_dir(): mount StaticFiles; else: register @app.get('/') fallback returning JSON",
+    "verdict": "Correct. Fallback route is only registered inside the else-branch, so it never shadows static serving when the build exists. Returned JSON contains the required keys: error, expected_at, fix. expected_at uses absolute path via str(_build_dir).",
+    "notes": [
+      "Build dir currently present in container; StaticFiles mounted at '/', fallback branch not registered (verified by GET / returning text/html of index.html, not JSON).",
+      "Minor (non-blocking): app.add_middleware(CORSMiddleware,...) is called AFTER app.mount('/',...) and app.include_router(...). Starlette adds middleware to the outer stack regardless of order, so it still applies, but by convention middleware is registered before routes/mounts. Existing behavior unchanged from prior iterations."
+    ]
+  },
+  "verifications": {
+    "GET /": "200 text/html; body begins with <!doctype html> (index.html served from frontend/build) — static serving unaffected by new fallback",
+    "GET /api/health": "200 {status: ok, simulator: true, last_packet_age_sec: 0.03, stale: false, heading present, packets increasing}",
+    "WS /api/ws/heading": "Streams JSON frames containing heading, rot, cog, sog at ~10Hz (3 consecutive frames received in <1s)"
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "CORSMiddleware is added after routes/mount; harmless but non-idiomatic. Consider moving app.add_middleware(...) call above app.include_router and the static mount for clarity."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iteration 5 only validated the new build-missing fallback branch (code review) and re-ran a light regression (GET /, /api/health, WS). Per main agent instruction, frontend/build was NOT deleted to exercise the else-branch at runtime; static code review confirms correctness."
+}

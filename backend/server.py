@@ -269,6 +269,14 @@ if _build_dir.is_dir():
     from fastapi.staticfiles import StaticFiles
     app.mount("/", StaticFiles(directory=_build_dir, html=True), name="static")
     logger.info("Serving frontend build from %s", _build_dir)
+else:
+    @app.get("/")
+    async def _build_missing():
+        return {
+            "error": "frontend build not found",
+            "expected_at": str(_build_dir),
+            "fix": "Copy the frontend/build folder from the project ZIP so it sits NEXT TO the backend folder (…/backend and …/frontend/build), then close and re-run run.bat.",
+        }
 
 app.add_middleware(
     CORSMiddleware,
