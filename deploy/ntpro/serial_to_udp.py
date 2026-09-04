@@ -28,10 +28,25 @@ def main():
             with serial.Serial(COM_PORT, BAUD, bytesize=8, parity="N",
                                stopbits=1, timeout=1) as port:
                 print("Port open. Forwarding NMEA...")
+                count = 0
+                last_line = None
+                last_report = time.time()
                 while True:
                     line = port.readline()
                     if line.startswith(b"$"):
                         sock.sendto(line.strip() + b"\r\n", TARGET)
+                        count += 1
+                        last_line = line.strip().decode("ascii", "ignore")
+                    now = time.time()
+                    if now - last_report >= 2:
+                        if count:
+                            print(f"OK  forwarded {count} sentences | last: {last_line}")
+                        else:
+                            print("... port SILENT (no NMEA) - check: Nmea.exe link running? "
+                                  "NmeaPort window -> COM3, this script reads the OTHER end (COM4)? "
+                                  "simulator running?")
+                        count = 0
+                        last_report = now
         except serial.SerialException as e:
             print(f"Serial error: {e} - retrying in 3 s")
             time.sleep(3)
