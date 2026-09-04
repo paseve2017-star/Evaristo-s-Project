@@ -3,7 +3,7 @@ rem ============================================================
 rem  NTPRO Gyro Compass Repeater - backend launcher
 rem  Double-click to start. Repeater UI: http://<this-pc-ip>:8000
 rem ============================================================
-cd /d %~dp0
+cd /d %~dp0..\backend
 
 set SIMULATOR_MODE=false
 set UDP_HOST=0.0.0.0

@@ -1,0 +1,17 @@
+{
+  "summary": "Narrow regression after deploy/run.bat packaging-only fix (Windows batch cd to backend dir before uvicorn). Confirmed zero app-code regression: /api/health returns status ok with simulator=true and fresh last_packet_age_sec (~0.06s); WebSocket /api/ws/heading streams at exactly 10 Hz (20 frames / 2s) with numeric heading/rot/cog/sog (plus ts, sentence, stale, age_sec, simulator, udp_port); GET / serves the static React build (HTTP 200, text/html). Frontend at public URL loads with SIM badge, LIVE green status, compass rendering 279.8° TRUE, COG 281.9°, SOG 4.4 kn, ROT 22.0°/min STBD, HEVTG sentence in NMEA footer, heading history chart polyline visible. deploy/run.bat fix reviewed: `cd /d %~dp0..\\backend` is correct - resolves to sibling backend/ dir regardless of invocation cwd. No new pytest run needed (v1/v2 suites unaffected per request).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/tmp/ws_check.py"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "deploy/run.bat fix is correct and minimal. %~dp0 always ends with a backslash so %~dp0..\\backend resolves cleanly. `cd /d` handles drive changes. No app code touched."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (regression: /api/health, /api/ws/heading, GET / all pass)", "frontend": "100%"},
+  "seed_data_creation": "None.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iteration 3 was a scoped regression check for a Windows batch script fix. App is unchanged and fully healthy. Pre-existing minor items from iteration 2 (2 flaky legacy tests in test_gyro_repeater.py; harmless hardcoded '±5° auto' label in HeadingChart) still apply and were NOT re-verified.",
+  "rca of the issue": "Original bug: deploy/run.bat lacked cwd change so `python -m uvicorn server:app` ran from deploy/ where server.py doesn't exist. Fix: `cd /d %~dp0..\\backend` before launch. Verified logically; not executable in Linux container."
+}
