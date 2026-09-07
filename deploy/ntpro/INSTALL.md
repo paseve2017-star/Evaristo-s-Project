@@ -76,6 +76,7 @@
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
+| Bridge prints "port SILENT" | Nothing is writing to the COM pair | Run `com_test_writer.py` — if bridge then shows "OK forwarded", the pair+bridge are fine and the fault is NmeaPort config: check gyroudp.cfg `[Plugins]` is NOT empty (copy the working block), the link is started in Nmea.exe, NmeaPort window → COM3. If bridge STAYS silent, the com0com pair is wrong (port names/direction) |
 | Red NO DATA, Nmea.exe shows script running | Windows firewall on repeater PC | Re-run firewall-setup.bat as Admin |
 | Red NO DATA, other LAN PCs work | NTPRO PC firewall blocks outbound broadcast | Allow Nmea.exe outbound UDP, or switch gyroudp.cfg to unicast to the repeater PC IP |
 | LED green but heading frozen | Sim paused / heading static in scenario | Normal — LED stays green while packets arrive |
