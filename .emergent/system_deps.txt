@@ -1,1 +1,3 @@
 cron=3.0pl1-162
+p7zip-full=16.02+really26.02+dfsg-0+deb12u1
+unrar-free=1:0.1.3-1
