@@ -17,6 +17,7 @@ load_dotenv(ROOT_DIR / '.env')
 
 UDP_HOST = os.environ.get("UDP_HOST", "0.0.0.0")
 UDP_PORT = int(os.environ.get("UDP_PORT", "4001"))
+TCP_PORT = int(os.environ.get("NMEA_TCP_PORT", "4002"))  # direct TCP feed from Nmea.exe TelnetTransport
 SIMULATOR_MODE = os.environ.get("SIMULATOR_MODE", "true").lower() == "true"
 STALE_AFTER_SEC = 2.0
 PUSH_INTERVAL_SEC = 0.1  # 10 Hz
@@ -139,17 +140,46 @@ def build_vtg(cog: float, sog: float) -> str:
 
 class HeadingUDPProtocol(asyncio.DatagramProtocol):
     def datagram_received(self, data: bytes, addr):
-        try:
-            text = data.decode("ascii", errors="ignore")
-        except Exception:
-            return
-        for line in text.splitlines():
-            if not handle_sentence(line):
+        process_data(data, f"{addr[0]}:{addr[1]}")
+
+
+def process_data(data: bytes, sender: str):
+    try:
+        text = data.decode("ascii", errors="ignore")
+    except Exception:
+        return
+    for line in text.splitlines():
+        if not handle_sentence(line):
+            continue
+        state["last_packet_at"] = time.monotonic()
+        state["last_sentence"] = line.strip()
+        state["last_sender"] = sender
+        state["packets"] += 1
+
+
+async def handle_tcp_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+    """Direct NMEA-over-TCP feed (Nmea.exe TelnetTransport)."""
+    peer = writer.get_extra_info("peername")
+    peer_str = f"{peer[0]}:{peer[1]}" if peer else "tcp"
+    logger.info("TCP NMEA client connected: %s", peer_str)
+    buf = b""
+    try:
+        while True:
+            chunk = await reader.read(4096)
+            if not chunk:
+                break
+            buf += chunk
+            if len(buf) > 65536:  # sanity cap: drop garbage clients
+                buf = b""
                 continue
-            state["last_packet_at"] = time.monotonic()
-            state["last_sentence"] = line.strip()
-            state["last_sender"] = f"{addr[0]}:{addr[1]}"
-            state["packets"] += 1
+            while b"\n" in buf:
+                line, buf = buf.split(b"\n", 1)
+                process_data(line, peer_str)
+    except Exception:
+        pass
+    finally:
+        writer.close()
+        logger.info("TCP NMEA client disconnected: %s", peer_str)
 
 
 async def broadcast_loop():
@@ -213,6 +243,8 @@ async def lifespan(app: FastAPI):
     loop = asyncio.get_running_loop()
     await loop.create_datagram_endpoint(HeadingUDPProtocol, local_addr=(UDP_HOST, UDP_PORT))
     logger.info("UDP listener bound on %s:%s", UDP_HOST, UDP_PORT)
+    await asyncio.start_server(handle_tcp_client, UDP_HOST, TCP_PORT)
+    logger.info("TCP NMEA listener bound on %s:%s", UDP_HOST, TCP_PORT)
     tasks = [asyncio.create_task(broadcast_loop())]
     if SIMULATOR_MODE:
         tasks.append(asyncio.create_task(simulator_loop()))
