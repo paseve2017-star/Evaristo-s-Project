@@ -15,7 +15,12 @@ import serial  # pyserial
 # ----- CONFIGURE THESE -----
 COM_PORT = "COM3"            # COM port NmeaPort.dll outputs to
 BAUD = 4800                  # NmeaPort.dll default: 4800 8N1
-TARGET = ("192.168.0.255", 4001)  # LAN broadcast : repeater port
+# TARGET examples (your LAN):
+#   same-PC test        -> ("127.0.0.1", 4001)
+#   two-PC (UNICAST, recommended): repeater PC 192.168.0.10
+#                       -> ("192.168.0.10", 4001)
+#   whole-LAN broadcast -> ("192.168.0.255", 4001)  (needs /24 mask; skip if LAN restricted)
+TARGET = ("192.168.0.10", 4001)
 # ----------------------------
 
 
