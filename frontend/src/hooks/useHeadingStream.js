@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-
 export function defaultWsUrl() {
-  const proto = BACKEND_URL.startsWith("https") ? "wss" : "ws";
-  return `${proto}://${BACKEND_URL.replace(/^https?:\/\//, "")}/api/ws/heading`;
+  // Same-origin: the backend serves both the static UI and the WS endpoint,
+  // so derive the WS URL from wherever the page was loaded (works in the
+  // cloud preview AND on offline LAN installs).
+  const proto = window.location.protocol === "https:" ? "wss" : "ws";
+  return `${proto}://${window.location.host}/api/ws/heading`;
 }
 
 export function getWsUrl() {

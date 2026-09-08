@@ -1,0 +1,17 @@
+{
+  "summary": "Iteration 8 - verified the same-origin WS URL derivation fix. /api/health returns ok (udp_port=4001, simulator=true). Frontend loads, WebSocket connects to wss://compass-display.preview.emergentagent.com/api/ws/heading (matches window.location.host - same-origin confirmed). LED data-status=live, digital heading updates (277.7°), COG/SOG/ROT all populated, NMEA log feeding. Settings dialog opens and populates udp-port-value=4001 and simulator-mode-value=SIMULATOR via relative /api fetch. Zero console errors. grep confirms no REACT_APP_BACKEND_URL usages remain in /app/frontend/src.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Note: an extra websocket to wss://<host>/ws is opened (likely CRA dev-server sockjs/webpack-hmr artifact carried over). Harmless in production preview but worth confirming it's not from a stale service worker or dev-only code path.",
+    "frontend/.env still contains REACT_APP_BACKEND_URL — safe now because nothing reads it, but consider removing to avoid future footguns."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Same-origin WS fix verified in cloud preview. Offline-LAN scenario itself can only be validated on-site by the user. WS URL observed: wss://compass-display.preview.emergentagent.com/api/ws/heading (matches window.location.host)."
+}
