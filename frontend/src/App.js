@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import "@/App.css";
 import { CompassRose } from "@/components/CompassRose";
 import { SettingsDialog } from "@/components/SettingsDialog";
-import { RotIndicator } from "@/components/RotIndicator";
-import { HeadingChart } from "@/components/HeadingChart";
 import { useHeadingStream } from "@/hooks/useHeadingStream";
 import { Maximize, Minimize, Settings, Crosshair, RotateCcw } from "lucide-react";
 
@@ -31,7 +29,7 @@ function StatusLed({ status }) {
 }
 
 export default function App() {
-  const { heading, status, sentence, simulator, udpPort, wsUrl, applyWsUrl, rot, cog, sog, historyRef } = useHeadingStream();
+  const { heading, status, sentence, simulator, udpPort, wsUrl, applyWsUrl } = useHeadingStream();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bearingVisible, setBearingVisible] = useState(true);
@@ -87,7 +85,7 @@ export default function App() {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
           <StatusLed status={status} />
           <button
             data-testid="bearing-toggle-button"
@@ -126,7 +124,7 @@ export default function App() {
 
       {/* Compass */}
       <main className="relative flex-1 flex items-center justify-center min-h-0">
-        <div className="h-full max-h-full aspect-square p-2">
+        <div className="h-full max-h-full max-w-full aspect-square p-2">
           <CompassRose
             heading={heading}
             bearing={bearing}
@@ -144,14 +142,14 @@ export default function App() {
                 <>
                   <span
                     className="font-bold tracking-tighter text-white"
-                    style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "clamp(3rem, 9vmin, 6.5rem)" }}
+                    style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "clamp(2rem, 6vmin, 4.2rem)" }}
                   >
                     {intPart.padStart(3, "0")}
                   </span>
                   <span
                     data-testid="digital-heading-tenths"
                     className="font-light text-slate-400"
-                    style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "clamp(1.6rem, 5vmin, 3.4rem)" }}
+                    style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "clamp(1.1rem, 3.2vmin, 2.2rem)" }}
                   >
                     {`.${decPart}°`}
                   </span>
@@ -184,28 +182,6 @@ export default function App() {
           )}
         </div>
       </main>
-
-      {/* Bottom instruments: COG/SOG + ROT + 60 s heading strip */}
-      <section className="px-5 pb-2 space-y-2">
-        <div className="flex items-end justify-between gap-8">
-          <div className="flex gap-8 font-mono" data-testid="vtg-panel">
-            <div>
-              <div className="text-[10px] tracking-[0.25em] text-slate-500 uppercase">COG</div>
-              <div data-testid="cog-value" className="text-cyan-300 text-lg sm:text-xl font-semibold">
-                {cog === null ? "---.-°" : `${cog.toFixed(1).padStart(5, "0")}°`}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] tracking-[0.25em] text-slate-500 uppercase">SOG</div>
-              <div data-testid="sog-value" className="text-cyan-300 text-lg sm:text-xl font-semibold">
-                {sog === null ? "--.- kn" : `${sog.toFixed(1)} kn`}
-              </div>
-            </div>
-          </div>
-          <RotIndicator rot={rot} />
-        </div>
-        <HeadingChart history={historyRef.current} />
-      </section>
 
       {/* Bottom status bar */}
       <footer className="flex items-center justify-between px-5 py-2.5 border-t border-[#1E2633] font-mono text-[11px] text-slate-500">
