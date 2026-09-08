@@ -64,13 +64,18 @@ export default function App() {
 
   const trueBearing = heading === null ? null : (heading + bearing) % 360;
 
+  // Default = plain gyro-repeater face only. Add ?panel=1 to the URL for the
+  // diagnostic display (digital readout, bearing tool, status bars, settings).
+  const showPanel = new URLSearchParams(window.location.search).has("panel");
+
   return (
     <div
       data-testid="gyro-repeater-app"
       className="w-screen h-screen overflow-hidden flex flex-col select-none"
       style={{ backgroundColor: "#05070A" }}
     >
-      {/* Top HUD */}
+      {/* Top HUD (panel mode only) */}
+      {showPanel && (
       <header className="flex items-center justify-between px-5 py-3 border-b border-[#1E2633]">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[11px] sm:text-xs tracking-[0.3em] text-slate-400 uppercase">
@@ -121,6 +126,7 @@ export default function App() {
           </button>
         </div>
       </header>
+      )}
 
       {/* Compass */}
       <main className="relative flex-1 flex items-center justify-center min-h-0">
@@ -128,12 +134,13 @@ export default function App() {
           <CompassRose
             heading={heading}
             bearing={bearing}
-            bearingVisible={bearingVisible}
+            bearingVisible={showPanel && bearingVisible}
             onBearingChange={setBearing}
           />
         </div>
 
-        {/* Center digital readout */}
+        {/* Center digital readout (panel mode only) */}
+        {showPanel && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="flex items-baseline" data-testid="digital-heading-value">
             {(() => {
@@ -181,9 +188,11 @@ export default function App() {
             </div>
           )}
         </div>
+        )}
       </main>
 
-      {/* Bottom status bar */}
+      {/* Bottom status bar (panel mode only) */}
+      {showPanel && (
       <footer className="flex items-center justify-between px-5 py-2.5 border-t border-[#1E2633] font-mono text-[11px] text-slate-500">
         <span data-testid="nmea-log-feed" className="truncate max-w-[45%] text-slate-400">
           {sentence || "waiting for $HEHDT …"}
@@ -195,6 +204,7 @@ export default function App() {
           F fullscreen · B bearing · R reset · S settings
         </span>
       </footer>
+      )}
 
       <SettingsDialog
         open={settingsOpen}
