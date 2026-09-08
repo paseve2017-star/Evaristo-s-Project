@@ -13,7 +13,9 @@ import time
 import serial  # pyserial
 
 # ----- CONFIGURE THESE -----
-COM_PORT = "COM3"            # COM port NmeaPort.dll outputs to
+# com0com pair: NmeaPort (or com_test_writer.py) WRITES to COM3,
+# this bridge READS from the OTHER end = COM4.
+COM_PORT = "COM4"            # READ end of the pair (NOT the port NmeaPort uses!)
 BAUD = 4800                  # NmeaPort.dll default: 4800 8N1
 # TARGET examples (your LAN):
 #   same-PC test        -> ("127.0.0.1", 4001)
