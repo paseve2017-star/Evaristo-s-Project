@@ -19,10 +19,10 @@ COM_PORT = "COM4"            # READ end of the pair (NOT the port NmeaPort uses!
 BAUD = 4800                  # NmeaPort.dll default: 4800 8N1
 # TARGET examples (your LAN):
 #   same-PC test        -> ("127.0.0.1", 4001)
-#   two-PC (UNICAST, recommended): repeater PC 192.168.0.10
-#                       -> ("192.168.0.10", 4001)
+#   two-PC (UNICAST, recommended): NTPRO PC=192.168.0.10, repeater PC=192.168.0.20
+#                       -> ("192.168.0.20", 4001)
 #   whole-LAN broadcast -> ("192.168.0.255", 4001)  (needs /24 mask; skip if LAN restricted)
-TARGET = ("192.168.0.10", 4001)
+TARGET = ("192.168.0.20", 4001)
 # ----------------------------
 
 

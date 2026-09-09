@@ -1,12 +1,12 @@
 # Gyro Repeater — Two-PC Setup Procedure (Final)
 
 Machines:
-- **NTPRO PC** (192.168.0.1, Windows 2008 Server, runs Instructor Station / simulator)
-- **Repeater Station PC** (192.168.0.10, dedicated gyro display, 800×800 monitor)
+- **NTPRO PC** (192.168.0.20, Windows 2008 Server, runs Instructor Station / simulator)
+- **Repeater Station PC** (192.168.0.20, dedicated gyro display, 800×800 monitor)
 
 ---
 
-## PART 1 — NTPRO PC (192.168.0.1) — one-time setup
+## PART 1 — NTPRO PC (192.168.0.20) — one-time setup
 
 ### 1.1 Virtual COM pair (com0com)
 1. Install com0com v3.0.0.0 (signed): `com0com-3.0.0.0-i386-and-x64-signed.zip` from SourceForge.
@@ -35,12 +35,12 @@ Machines:
    ```python
    COM_PORT = "COM4"                      # READ end of the pair (NMEA interface writes COM3)
    BAUD = 4800
-   TARGET = ("192.168.0.10", 4001)        # the Repeater Station PC
+   TARGET = ("192.168.0.20", 4001)        # the Repeater Station PC
    ```
 
 ---
 
-## PART 2 — Repeater Station PC (192.168.0.10) — one-time setup
+## PART 2 — Repeater Station PC (192.168.0.20) — one-time setup
 
 ### 2.1 Software
 1. Install Python 3.8.x (Win7/2008) or 3.10+ (Win10/11) — tick "Add to PATH".
@@ -77,12 +77,12 @@ Machines:
 **On the Repeater Station PC:**
 1. Run `run.bat` (in `backend\`, or autostart) — console shows UDP :4001 / HTTP :8000.
 2. Open the display:
-   - Browser → `http://192.168.0.10:8000` → press **F** (fullscreen), or
+   - Browser → `http://192.168.0.20:8000` → press **F** (fullscreen), or
    - Dedicated kiosk shortcut:
-     `"C:\...\chrome.exe" --kiosk http://192.168.0.10:8000`
+     `"C:\...\chrome.exe" --kiosk http://192.168.0.20:8000`
 3. You get the **plain full-screen gyro card** (default). 
    For diagnostics (digital readout, bearing tool, status LED, settings) use
-   `http://192.168.0.10:8000/?panel=1`.
+   `http://192.168.0.20:8000/?panel=1`.
 
 ---
 
@@ -91,13 +91,13 @@ Machines:
 | Check | Where | Expected |
 |---|---|---|
 | Bridge forwarding | NTPRO PC bridge console | `OK forwarded … $HEHDT,<heading>,T*…` |
-| Backend receiving | any browser → `http://192.168.0.10:8000/api/health` | `"simulator": false`, `"stale": false`, heading numeric |
+| Backend receiving | any browser → `http://192.168.0.20:8000/api/health` | `"simulator": false`, `"stale": false`, heading numeric |
 | Display live | repeater screen | card rotates with the Instructor Station gyro (~1 Hz) |
 
 | Symptom | Fix |
 |---|---|
 | Bridge "port SILENT" | NMEA interface not on COM3 / not saved as default / sim not running |
 | Bridge "Serial error" | wrong COM_PORT in serial_to_udp.py (must be COM4, the read end) |
-| Page opens but nothing moves (panel mode: red NO DATA) | firewall rule missing on 192.168.0.10 → run firewall-setup.bat as admin |
+| Page opens but nothing moves (panel mode: red NO DATA) | firewall rule missing on 192.168.0.20 → run firewall-setup.bat as admin |
 | Page "frontend build not found" | `frontend\build` must sit NEXT TO `backend\`; restart run.bat after copying |
-| Other LAN PCs can't open the page | use `http://192.168.0.10:8000` (not localhost); check Windows firewall HTTP 8000 |
+| Other LAN PCs can't open the page | use `http://192.168.0.20:8000` (not localhost); check Windows firewall HTTP 8000 |
