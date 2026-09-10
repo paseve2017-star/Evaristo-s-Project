@@ -64,9 +64,19 @@ export default function App() {
 
   const trueBearing = heading === null ? null : (heading + bearing) % 360;
 
-  // Default = plain gyro-repeater face only. Add ?panel=1 to the URL for the
-  // diagnostic display (digital readout, bearing tool, status bars, settings).
-  const showPanel = new URLSearchParams(window.location.search).has("panel");
+  // Display modes via URL query params (change display without rebuild):
+  //   (default)          plain analog card only
+  //   ?panel=1           full diagnostic display
+  //   ?digital=1 / =0    force center digital readout on/off
+  //   ?bearing=1 / =0    force bearing sight tool on/off
+  //   ?hud=1 / =0        force top/bottom status bars on/off
+  //   Combinable, e.g.  http://localhost:8000/?digital=1&bearing=1
+  const q = new URLSearchParams(window.location.search);
+  const showPanel = q.has("panel");
+  const pick = (key) => (q.has(key) ? q.get(key) !== "0" : showPanel);
+  const showHud = pick("hud");
+  const showDigital = pick("digital");
+  const showBearing = pick("bearing");
 
   return (
     <div
@@ -74,8 +84,8 @@ export default function App() {
       className="w-screen h-screen overflow-hidden flex flex-col select-none"
       style={{ backgroundColor: "#05070A" }}
     >
-      {/* Top HUD (panel mode only) */}
-      {showPanel && (
+      {/* Top HUD */}
+      {showHud && (
       <header className="flex items-center justify-between px-5 py-3 border-b border-[#1E2633]">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[11px] sm:text-xs tracking-[0.3em] text-slate-400 uppercase">
@@ -134,13 +144,13 @@ export default function App() {
           <CompassRose
             heading={heading}
             bearing={bearing}
-            bearingVisible={showPanel && bearingVisible}
+            bearingVisible={showBearing && bearingVisible}
             onBearingChange={setBearing}
           />
         </div>
 
-        {/* Center digital readout (panel mode only) */}
-        {showPanel && (
+        {/* Center digital readout */}
+        {showDigital && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="flex items-baseline" data-testid="digital-heading-value">
             {(() => {
@@ -191,8 +201,8 @@ export default function App() {
         )}
       </main>
 
-      {/* Bottom status bar (panel mode only) */}
-      {showPanel && (
+      {/* Bottom status bar */}
+      {showHud && (
       <footer className="flex items-center justify-between px-5 py-2.5 border-t border-[#1E2633] font-mono text-[11px] text-slate-500">
         <span data-testid="nmea-log-feed" className="truncate max-w-[45%] text-slate-400">
           {sentence || "waiting for $HEHDT …"}
