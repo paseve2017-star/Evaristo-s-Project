@@ -243,10 +243,9 @@ export const CompassRose = ({ heading, headingRaw, bearing, bearingVisible, onBe
         </g>
       )}
 
-      {/* Fixed lubber line at 12 o'clock */}
+      {/* Fixed lubber line at 12 o'clock: simple red line to the inner ring */}
       <g data-testid="lubber-line">
-        <polygon points="0,-494 -16,-452 16,-452" fill="#FF3B30" />
-        <line x1="0" y1="-452" x2="0" y2="-400" stroke="#FF3B30" strokeWidth="6" />
+        <line x1="0" y1="-494" x2="0" y2="-272" stroke="#FF3B30" strokeWidth="6" />
       </g>
 
       {/* Center hub + brass pivot (like the physical repeater) */}
