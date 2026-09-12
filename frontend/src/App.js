@@ -29,7 +29,7 @@ function StatusLed({ status }) {
 }
 
 export default function App() {
-  const { heading, status, sentence, simulator, udpPort, wsUrl, applyWsUrl } = useHeadingStream();
+  const { heading, headingRaw, status, sentence, simulator, udpPort, wsUrl, applyWsUrl } = useHeadingStream();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bearingVisible, setBearingVisible] = useState(true);
@@ -143,6 +143,7 @@ export default function App() {
         <div className="h-full max-h-full max-w-full aspect-square p-2">
           <CompassRose
             heading={heading}
+            headingRaw={headingRaw}
             bearing={bearing}
             bearingVisible={showBearing && bearingVisible}
             onBearingChange={setBearing}

@@ -14,6 +14,7 @@ export function getWsUrl() {
 
 export function useHeadingStream() {
   const [heading, setHeading] = useState(null); // smoothed display value
+  const [headingRaw, setHeadingRaw] = useState(null); // unwrapped (drives minute dial)
   const [status, setStatus] = useState("offline"); // live | stale | offline
   const [sentence, setSentence] = useState(null);
   const [simulator, setSimulator] = useState(false);
@@ -26,6 +27,7 @@ export function useHeadingStream() {
 
   const targetRef = useRef(null);
   const displayRef = useRef(null);
+  const uwRef = useRef(null); // unwrapped accumulated heading
   const lastMsgAtRef = useRef(0);
   const wsOpenRef = useRef(false);
   const wsRef = useRef(null);
@@ -91,7 +93,10 @@ export function useHeadingStream() {
         const diff = ((t - d + 540) % 360) - 180;
         const next = (d + diff * 0.14 + 360) % 360;
         displayRef.current = next;
+        if (uwRef.current === null) uwRef.current = t;
+        uwRef.current += diff * 0.14;
         setHeading(next);
+        setHeadingRaw(uwRef.current);
       }
       raf = requestAnimationFrame(tick);
     };
@@ -119,5 +124,5 @@ export function useHeadingStream() {
     setWsUrl(getWsUrl());
   }, []);
 
-  return { heading, status, sentence, simulator, udpPort, wsUrl, applyWsUrl, rot, cog, sog, historyRef };
+  return { heading, headingRaw, status, sentence, simulator, udpPort, wsUrl, applyWsUrl, rot, cog, sog, historyRef };
 }
