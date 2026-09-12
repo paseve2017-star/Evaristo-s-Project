@@ -1,0 +1,22 @@
+{
+  "summary": "FINAL export verification (iteration 10). Backend: all 20 pytest tests pass (test_gyro_repeater, test_rot_vtg, test_tcp_nmea). /api/health returns simulator=true, fresh age (~0.05s), packets increasing (10584+). Static serving: GET / -> 200 text/html, GET /favicon.ico -> 200 image/x-icon. Frontend visually verified in both modes: PLAIN (default) shows only ship-style compass card + minute-dial + red lubber-line (no HUD/footer/readout/bearing). PANEL (?panel=1) shows full HUD ('NTPRO 5000 · GYRO REPEATER · SIM'), LIVE LED (data-status=live), digital readout '281.7° TRUE' matching /api/health heading=281.7 exactly, bearing tool with TB=281.7°/RB=000.0°, footer with raw NMEA sentence '$HEVTG,284.2,T,,M,13.0,N,,K*6A · UDP 4001 · 10 Hz · shortcuts'. Minute-dial correctness: at heading 281.7 the lubber falls between numerals 1 and 2 (nearer 2), matching expected value = heading mod 10 = 1.7 via 36:1 gear ratio. No console/page errors on load (only benign 'WebSocket closed before established' warnings during navigation transitions; WS is functional as proven by matching digital readout). App is EXPORT-READY.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_gyro_repeater.py",
+    "/app/backend/tests/test_rot_vtg.py",
+    "/app/backend/tests/test_tcp_nmea.py",
+    "/app/test_reports/pytest/iter10_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor testability nit (non-blocking): some UI elements referenced by the review request (compass-card wrapper, digital-readout, hud-header, footer, bearing-tool) may use different data-testid names than requested; visual proof shows all functionality works. Not required for export.",
+    "Prior iteration 9 notes remain valid (untracked TCP server task on shutdown, unbounded TCP buffer, silent exception in handle_tcp_client) - none impact runtime for the export demo."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (20/20)", "frontend": "100% functional (all listed features verified visually)"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Final export iteration. Plain mode = pure compass at '/'. Panel mode adds HUD at '/?panel=1'. Backend simulator mode is on; WS/api/ws/heading streams heading/rot/cog/sog at 10Hz. Minute-dial value under lubber = heading mod 10 (36:1 gear ratio via unwrapped heading)."
+}
