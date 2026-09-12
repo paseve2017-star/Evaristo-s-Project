@@ -89,23 +89,15 @@ function Needles() {
   const items = [];
   Object.entries(CARDINALS).forEach(([deg]) => {
     const a = Number(deg);
-    if (a === 0) {
-      // N: simple red line from the card edge down to the inner minutes ring
-      items.push(
-        <g key={`cn-${a}`} transform={`rotate(${a})`}>
-          <line x1="0" y1="-465" x2="0" y2="-272" stroke="#FF3B30" strokeWidth="6" />
-        </g>
-      );
-      return;
-    }
+    const north = a === 0;
     items.push(
       <g key={`cn-${a}`} transform={`rotate(${a})`}>
         <polygon
           points="0,-335 22,-465 -22,-465"
-          fill="#F2EDE0"
+          fill={north ? "#FF3B30" : "#F2EDE0"}
           stroke="#05070A"
           strokeWidth="2"
-          opacity="0.92"
+          opacity={north ? 1 : 0.92}
         />
       </g>
     );
