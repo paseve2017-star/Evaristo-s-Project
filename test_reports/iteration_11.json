@@ -1,0 +1,27 @@
+{
+  "summary": "Iteration 11 narrow verification of no_cache_html middleware + regression. All checks pass: GET / returns text/html with Cache-Control: no-cache from backend directly; static JS bundle NOT forced to no-cache (served with normal caching); /api/health OK with fresh packets and simulator=true; favicon 200; plain mode compass renders (SVG present, lubber line visible); panel mode LED data-status=live and heading readout updates (~279.6° TRUE observed with live NMEA sentence in footer); zero console errors; 20/20 backend pytest pass.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_gyro_repeater.py", "/app/backend/tests/test_rot_vtg.py", "/app/backend/tests/test_tcp_nmea.py", "/app/test_reports/pytest/iter11_results.xml"],
+  "verification_details": {
+    "direct_backend_root_headers": "content-type: text/html; charset=utf-8, cache-control: no-cache (middleware applied correctly)",
+    "direct_backend_static_js_headers": "content-type: text/javascript; charset=utf-8, NO Cache-Control header forced (correct - middleware only touches text/html)",
+    "public_url_root_headers": "text/html with cache-control: no-store, no-cache, must-revalidate (ingress/CF adds stricter no-store on top; still satisfies the no-cache guarantee)",
+    "api_health": "status=ok, simulator=true, last_packet_age_sec≈0.03, packets increasing (>1300)",
+    "favicon": "200 image/x-icon",
+    "panel_mode": "LED data-status=live, readout 279.6° TRUE, footer showing $HEVTG sentence updating",
+    "console_errors": "none",
+    "pytest": "20 passed in 8.91s"
+  },
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor: middleware is added AFTER app.include_router and after StaticFiles mount, but Starlette middleware stack is built at first request so order is fine. Note that add_middleware(CORS) is also called after include_router - works but conventionally added before. Not a bug.",
+    "Minor: middleware checks content-type startswith 'text/html' which covers 'text/html; charset=utf-8' correctly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Middleware no_cache_html fix verified end-to-end. Backend at 127.0.0.1:8001 emits Cache-Control: no-cache on HTML only; static JS unaffected. Public URL adds its own no-store via ingress. All 20 pytest tests green. No open issues."
+}

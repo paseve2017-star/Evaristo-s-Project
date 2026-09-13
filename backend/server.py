@@ -317,3 +317,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def no_cache_html(request, call_next):
+    # Browsers aggressively cache index.html; without no-cache, on-site
+    # updates (new build folder) don't appear until a manual hard refresh.
+    response = await call_next(request)
+    if response.headers.get("content-type", "").startswith("text/html"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
