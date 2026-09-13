@@ -28,6 +28,7 @@ export function useHeadingStream() {
   const targetRef = useRef(null);
   const displayRef = useRef(null);
   const uwRef = useRef(null); // unwrapped accumulated heading
+  const dialRef = useRef(null); // heavily-damped value for the 36:1 minutes ring
   const lastMsgAtRef = useRef(0);
   const wsOpenRef = useRef(false);
   const wsRef = useRef(null);
@@ -95,8 +96,11 @@ export function useHeadingStream() {
         displayRef.current = next;
         if (uwRef.current === null) uwRef.current = t;
         uwRef.current += diff * 0.14;
+        // Minutes ring turns 36x, so damp it harder to glide through 1 Hz updates
+        if (dialRef.current === null) dialRef.current = uwRef.current;
+        dialRef.current += (uwRef.current - dialRef.current) * 0.045;
         setHeading(next);
-        setHeadingRaw(uwRef.current);
+        setHeadingRaw(dialRef.current);
       }
       raf = requestAnimationFrame(tick);
     };

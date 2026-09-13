@@ -209,6 +209,11 @@ export const CompassRose = ({ heading, headingRaw, bearing, bearingVisible, onBe
           <stop offset="78%" stopColor="#0C0F14" />
           <stop offset="100%" stopColor="#11161F" />
         </radialGradient>
+        <radialGradient id="hubSilver" cx="50%" cy="42%" r="65%">
+          <stop offset="0%" stopColor="#EDEFF2" />
+          <stop offset="70%" stopColor="#C2C7CC" />
+          <stop offset="100%" stopColor="#9AA0A6" />
+        </radialGradient>
       </defs>
 
       {/* Bezel */}
@@ -240,8 +245,8 @@ export const CompassRose = ({ heading, headingRaw, bearing, bearingVisible, onBe
         <line x1="0" y1="-494" x2="0" y2="-272" stroke="#FF3B30" strokeWidth="6" />
       </g>
 
-      {/* Center hub + brass pivot (like the physical repeater) */}
-      <circle cx="0" cy="0" r="112" fill="#05070A" stroke="#1E2633" strokeWidth="3" />
+      {/* Center hub (silver) + brass pivot (like the physical repeater) */}
+      <circle cx="0" cy="0" r="112" fill="url(#hubSilver)" stroke="#6B7280" strokeWidth="3" />
       <circle cx="0" cy="0" r="10" fill="#C8A24A" stroke="#05070A" strokeWidth="2" />
     </svg>
   );

@@ -153,6 +153,7 @@ export default function App() {
         {/* Center digital readout */}
         {showDigital && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <div className="bg-[#05070A]/75 rounded-2xl px-6 py-2 backdrop-blur-sm flex flex-col items-center">
           <div className="flex items-baseline" data-testid="digital-heading-value">
             {(() => {
               const [intPart, decPart] = heading === null ? ["---", "-"] : heading.toFixed(1).split(".");
@@ -198,6 +199,7 @@ export default function App() {
               </div>
             </div>
           )}
+          </div>
         </div>
         )}
       </main>
