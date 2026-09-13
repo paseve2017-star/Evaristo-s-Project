@@ -10,7 +10,9 @@ rem    3. Copy a SHORTCUT to this file into that folder.
 rem  From then on: boot -> logon -> fullscreen gyro repeater.
 rem ============================================================
 
-set URL=http://localhost:8000
+rem Repeater PC address — using the IP (not localhost) avoids stale
+rem browser cache sticking to an old page on the localhost origin.
+set URL=http://192.168.0.20:8000
 
 rem --- locate Chrome (adjust if installed elsewhere) ---
 set CHROME="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
