@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<root>
+<uhi>
+<!-- Joystick/gamepad HID discovery script.
+     Traces raw analog (ain) and digital (din) addresses directly.
+     While this link runs: move each axis / press each button and watch
+     the trace output (UHI host console window, or Sysinternals DebugView
+     if no console appears). The address that changes = that control.
+
+     unit#1 = first HID device. If nothing traces, change unit#1 to
+     unit#2 (or add unit#0 lines) - multiple HID devices shift numbering.
+-->
+
+<!-- Analog axes, unit#1 -->
+<trace> ain\unit#1\port#1 </trace>
+<trace> ain\unit#1\port#2 </trace>
+<trace> ain\unit#1\port#3 </trace>
+<trace> ain\unit#1\port#4 </trace>
+<trace> ain\unit#1\port#5 </trace>
+<trace> ain\unit#1\port#6 </trace>
+<trace> ain\unit#1\port#7 </trace>
+<trace> ain\unit#1\port#8 </trace>
+
+<!-- Digital buttons, unit#1 -->
+<trace> din\unit#1\port#1 </trace>
+<trace> din\unit#1\port#2 </trace>
+<trace> din\unit#1\port#3 </trace>
+<trace> din\unit#1\port#4 </trace>
+<trace> din\unit#1\port#5 </trace>
+<trace> din\unit#1\port#6 </trace>
+<trace> din\unit#1\port#7 </trace>
+<trace> din\unit#1\port#8 </trace>
+<trace> din\unit#1\port#9 </trace>
+<trace> din\unit#1\port#10 </trace>
+<trace> din\unit#1\port#11 </trace>
+<trace> din\unit#1\port#12 </trace>
+<trace> din\unit#1\port#13 </trace>
+<trace> din\unit#1\port#14 </trace>
+<trace> din\unit#1\port#15 </trace>
+<trace> din\unit#1\port#16 </trace>
+
+</uhi>
+</root>
